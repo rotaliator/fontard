@@ -7,6 +7,18 @@
 
 ;; -----
 ;; fn's
+(defn prepare-input
+  "Prepares input (that could be in *.c format) for clojure string parsing
+  replaces tabs with 0x00 (empty column"
+  [s]
+  (let [block-start (str/index-of s "{")
+        block-end (str/index-of s "}" block-start)
+        s (if (and block-start block-end)
+            (subs s (inc block-start) block-end)
+            s)]
+    (-> s
+        (#(str/replace % #"/" ";"))
+        (#(str/replace % #"\t" "0x00, ")))))
 
 (defn str->int
   ([s] (str->int s 10))
@@ -41,15 +53,18 @@
 
 (defn input []
   [:div
-   [:input
+   [:textarea
     {:value (:input @app-state)
-     :on-change (fn [e] (swap! app-state assoc :input (.. e -target -value)))}]
+     :on-change (fn [e] (swap! app-state assoc :input (.. e -target -value)))
+     :rows 15
+     :cols 80}]
+   [:br]
    [:button
-    {:on-click (fn [_] (swap! app-state assoc :matrix (get-matrix (:input @app-state))))}
+    {:on-click (fn [_] (swap! app-state assoc :matrix (get-matrix (prepare-input (:input @app-state)))))}
     "draw"]])
 
 (defn board []
-  (let [box-width      25
+  (let [box-width      10
         matrix         (:matrix @app-state)
         [cols rows]    [(count matrix) (count (first matrix))]
         [width height] [(* cols box-width) (* rows box-width)]]
@@ -64,11 +79,11 @@
                :y      (* y box-width)
                :style  {:fill         (if led-on? "red" "black")
                         :stroke       "gray"
-                        :stroke-width 1}}])]))
+                        :stroke-width 0.6}}])]))
 
 (defn main-page []
   [:div
-   [:pre (pr-str @app-state)]
+   #_[:pre (pr-str @app-state)]
    [input]
    [board]])
 
