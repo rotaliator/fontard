@@ -9,7 +9,7 @@
 ;; fn's
 (defn prepare-input
   "Prepares input (that could be in *.c format) for clojure string parsing
-  replaces tabs with 0x00 (empty column"
+  replaces tabs with 0x00 (empty column)"
   [s]
   (let [block-start (str/index-of s "{")
         block-end (str/index-of s "}" block-start)
