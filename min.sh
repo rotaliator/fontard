@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 lein clean
-lein fig:min
+lein run -m figwheel.main --build-once min

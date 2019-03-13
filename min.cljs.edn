@@ -1,0 +1,8 @@
+^{:watch-dirs ["test" "src"]
+  :css-dirs ["resources/public/css"]
+  :auto-testing false
+}
+{:main fontard.core
+ :optimizations :advanced
+ :output-to "docs/static/main.js"
+}
