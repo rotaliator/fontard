@@ -12,10 +12,10 @@
   replaces tabs with 0x00 (empty column)"
   [s]
   (let [block-start (str/index-of s "{")
-        block-end (str/index-of s "}" block-start)
-        s (if (and block-start block-end)
-            (subs s (inc block-start) block-end)
-            s)]
+        block-end   (str/index-of s "}" block-start)
+        s           (if (and block-start block-end)
+                      (subs s (inc block-start) block-end)
+                      s)]
     (-> s
         (#(str/replace % #"/" ";"))
         (#(str/replace % #"\t" "0x00, ")))))
