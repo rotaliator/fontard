@@ -17,6 +17,8 @@
                       (subs s (inc block-start) block-end)
                       s)]
     (-> s
+        (str/trim)
+        (str/trim-newline)
         (#(str/replace % #"/" ";"))
         (#(str/replace % #"\t" "0x00, ")))))
 
@@ -30,6 +32,9 @@
   ([i base]
    (.toString i base)))
 
+(defn bin-str->hex-str [s]
+  (-> s (#(str->int % 2)) (#(int->str % 16)) (#(str "0x" %))))
+
 (defn add-leading-zeros [s len]
   (str (apply str (repeat (- len (count s)) "0")) s))
 
@@ -40,6 +45,13 @@
        (map #(add-leading-zeros % 8))
        (map reverse)
        (mapv (partial apply str))))
+
+
+(defn matrix->output [matrix]
+  (->> matrix
+       (map reverse)
+       (map #(apply str %))
+       (map bin-str->hex-str)))
 
 ;; -----
 ;; app-state
@@ -56,6 +68,9 @@
         new-pixel (get {"0" "1" "1" "0"} pixel)]
     (swap! app-state update-in [:matrix x] (partial set-at new-pixel y))))
 
+(defn set-output! [output]
+  (swap! app-state assoc :output output))
+
 ;; -------------------------
 ;; Views
 
@@ -64,12 +79,18 @@
    [:textarea
     {:value (:input @app-state)
      :on-change (fn [e] (swap! app-state assoc :input (.. e -target -value)))
-     :rows 15
+     :rows 10
      :cols 80}]
    [:br]
    [:button
     {:on-click (fn [_] (swap! app-state assoc :matrix (get-matrix (prepare-input (:input @app-state)))))}
-    "draw"]])
+    "Load"]])
+
+(defn output []
+  [:div
+   [:textarea {:value (:output @app-state)
+               :rows 10
+               :cols 80}]])
 
 (defn board []
   (let [box-width      10
@@ -88,13 +109,16 @@
                :style  {:fill         (if led-on? "red" "black")
                         :stroke       "gray"
                         :stroke-width 0.6}
-               :on-click (partial toggle-pixel! x y)}])]))
+               :on-click (fn [_]
+                           (let [new-state (toggle-pixel! x y)
+                                 output (matrix->output (:matrix new-state))]
+                             (set-output! output)))}])]))
 
 (defn main-page []
   [:div
-   #_[:pre (pr-str @app-state)]
    [input]
-   [board]])
+   [board]
+   [output]])
 
 
 (defn get-app-element []
