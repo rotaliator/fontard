@@ -60,6 +60,12 @@
                           :input initial-input
                           :matrix (get-matrix initial-input)}))
 
+(defn update-input! [input]
+  (swap! app-state assoc :input input))
+
+(defn update-matrix! [matrix]
+  (swap! app-state assoc :matrix matrix))
+
 (defn toggle-pixel! [x y]
   (let [set-at    (fn [new-val i s]
                     (apply str (assoc (vec s) i new-val)))
@@ -78,12 +84,12 @@
   [:div
    [:textarea
     {:value (:input @app-state)
-     :on-change (fn [e] (swap! app-state assoc :input (.. e -target -value)))
+     :on-change (fn [e] (update-input! (.. e -target -value)))
      :rows 10
      :cols 80}]
    [:br]
    [:button
-    {:on-click (fn [_] (swap! app-state assoc :matrix (get-matrix (prepare-input (:input @app-state)))))}
+    {:on-click (fn [_] (update-matrix! (get-matrix (prepare-input (:input @app-state)))))}
     "Load"]])
 
 (defn output []
