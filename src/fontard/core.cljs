@@ -1,6 +1,5 @@
 (ns ^:figwheel-hooks fontard.core
   (:require
-   [goog.dom :as gdom]
    [cljs.reader :refer [read-string]]
    [clojure.string :as str]
    [reagent.core :as reagent :refer [atom]]))
@@ -89,7 +88,7 @@
 
 
 (defn get-app-element []
-  (gdom/getElement "app"))
+  (js/document.getElementById "app"))
 
 (defn mount [el]
   (reagent/render-component [main-page] el))
