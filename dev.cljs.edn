@@ -1,4 +1,5 @@
 ^{:watch-dirs ["test" "src"]
   :css-dirs ["resources/public/css"]
   :auto-testing true}
-{:main fontard.core}
+{:main fontard.core
+ :source-map true}
