@@ -12,7 +12,8 @@
   [s]
   (let [block-start (str/index-of s "{")
         block-end   (str/index-of s "}" block-start)
-        s           (if (and block-start block-end)
+        has-blocks? (and block-start block-end)
+        s           (if has-blocks?
                       (subs s (inc block-start) block-end)
                       s)]
     (-> s
@@ -41,11 +42,19 @@
        (mapv (partial apply str))))
 
 ;; -----
-;; initial app-state
+;; app-state
 (def initial-input "0x20, 0x12, 0x0A, 0x06, 0x1E,")
 (defonce app-state (atom {:title "Fontard"
                           :input initial-input
                           :matrix (get-matrix initial-input)}))
+
+(defn toggle-pixel! [x y]
+  (let [set-at    (fn [new-val i s]
+                    (apply str (assoc (vec s) i new-val)))
+        matrix    (:matrix @app-state)
+        pixel     (get-in matrix [x y])
+        new-pixel (get {"0" "1" "1" "0"} pixel)]
+    (swap! app-state update-in [:matrix x] (partial set-at new-pixel y))))
 
 ;; -------------------------
 ;; Views
@@ -78,7 +87,8 @@
                :y      (* y box-width)
                :style  {:fill         (if led-on? "red" "black")
                         :stroke       "gray"
-                        :stroke-width 0.6}}])]))
+                        :stroke-width 0.6}
+               :on-click (partial toggle-pixel! x y)}])]))
 
 (defn main-page []
   [:div
