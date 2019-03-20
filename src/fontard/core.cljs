@@ -36,7 +36,7 @@
   (-> s (#(str->int % 2)) (#(int->str % 16)) (#(str "0x" %))))
 
 (defn add-leading-zeros [s len]
-  (str (apply str (repeat (- len (count s)) "0")) s))
+  (str (str/join (repeat (- len (count s)) "0")) s))
 
 (defn get-matrix [input]
   (->> (str/split input #",")
@@ -68,7 +68,7 @@
 
 (defn toggle-pixel! [x y]
   (let [set-at    (fn [new-val i s]
-                    (apply str (assoc (vec s) i new-val)))
+                    (str/join (assoc (vec s) i new-val)))
         matrix    (:matrix @app-state)
         pixel     (get-in matrix [x y])
         new-pixel (get {"0" "1" "1" "0"} pixel)]
