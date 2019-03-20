@@ -84,13 +84,14 @@
   [:div
    [:textarea
     {:value (:input @app-state)
-     :on-change (fn [e] (update-input! (.. e -target -value)))
+     :on-change (fn [e]
+                  (let [new-state (update-input! (.. e -target -value))
+                        input (prepare-input (:input new-state))
+                        output (matrix->output (:matrix new-state))]
+                    (update-matrix! (get-matrix input))
+                    (set-output! output)))
      :rows 10
-     :cols 80}]
-   [:br]
-   [:button
-    {:on-click (fn [_] (update-matrix! (get-matrix (prepare-input (:input @app-state)))))}
-    "Load"]])
+     :cols 80}]])
 
 (defn output []
   [:div
